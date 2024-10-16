@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import cn from 'classnames';
 
 import { Todo } from './types/Todo';
@@ -28,17 +28,17 @@ export const App: React.FC = () => {
     setErrorMessage(null);
   };
 
-  const handleErrorMessage = (error: ErrorType) => {
+  const handleErrorMessage = useCallback((error: ErrorType) => {
     setErrorMessage(error);
 
     setTimeout(handleRemoveError, 3000);
-  };
+  }, []);
 
   useEffect(() => {
     getTodos()
       .then(setTodos)
       .catch(() => handleErrorMessage(ErrorType.load));
-  }, [errorMessage]);
+  }, [errorMessage, handleErrorMessage]);
 
   if (!USER_ID) {
     return <UserWarning />;
