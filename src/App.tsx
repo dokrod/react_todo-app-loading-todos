@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import cn from 'classnames';
 
 import { Todo } from './types/Todo';
@@ -14,18 +14,23 @@ import { Footer } from './components/Footer';
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState(FilterType.all);
-  const [errorMessage, setErrorMessage] = useState<ErrorType | null>(null);
+  const [errorMessage, setErrorMessage] = useState<ErrorType>(
+    ErrorType.default,
+  );
 
-  const allIsCompleted = todos.every(todo => todo.completed === true);
+  const allIsCompleted = todos.every(todo => todo.completed);
 
-  const handleFilterChange = (filterBy: FilterType) => {
+  const handleFilterChange = useCallback((filterBy: FilterType) => {
     setFilter(filterBy);
-  };
+  }, []);
 
-  const filteredTodos = getFilteredTodos(todos, filter);
+  const filteredTodos = useMemo(
+    () => getFilteredTodos(todos, filter),
+    [todos, filter],
+  );
 
   const handleRemoveError = () => {
-    setErrorMessage(null);
+    setErrorMessage(ErrorType.default);
   };
 
   const handleErrorMessage = useCallback((error: ErrorType) => {
@@ -68,7 +73,7 @@ export const App: React.FC = () => {
 
         <TodoList todos={filteredTodos} />
 
-        {todos.length > 0 && (
+        {!!todos.length && (
           <Footer
             filterBy={filter}
             setFilter={handleFilterChange}
@@ -89,7 +94,7 @@ export const App: React.FC = () => {
           data-cy="HideErrorButton"
           type="button"
           className="delete"
-          onClick={() => handleRemoveError}
+          onClick={handleRemoveError}
         />
         {errorMessage}
       </div>

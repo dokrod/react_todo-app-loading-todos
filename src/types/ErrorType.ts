@@ -1,4 +1,5 @@
 export enum ErrorType {
+  default = '',
   load = 'Unable to load todos',
   title = 'Title should not be empty',
   add = 'Unable to add a todo',
